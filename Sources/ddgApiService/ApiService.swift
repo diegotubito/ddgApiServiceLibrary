@@ -1,26 +1,26 @@
 
 import Foundation
 
-final class NetworkApiClientConfig: NSObject {
-    var body: Data?
-    var path: String = ""
-    var query: String?
-    var method: String?
+public final class NetworkApiClientConfig: NSObject {
+    public var body: Data?
+    public var path: String = ""
+    public var query: String?
+    public var method: String?
 }
 
-class ApiCall {
+open class ApiCall {
     var session: URLSession
     var dataTask: URLSessionDataTask?
     var downloadTask: URLSessionDownloadTask?
     var uploadTask: URLSessionUploadTask?
     
-    var config: NetworkApiClientConfig
+    public var config: NetworkApiClientConfig
     
-    init() {
+    public init() {
         session = URLSession(configuration: .default)
         config = NetworkApiClientConfig()
     }
-    
+
     // Generic Wrapper
     public func apiCall<T: Decodable>(completion: @escaping (Result<T, APIError>) -> Void) {
         
@@ -87,7 +87,7 @@ class ApiCall {
         dataTask?.resume()
     }
     
-    func addRequestBody<TRequest> (_ body: TRequest?) where TRequest: Encodable {
+    public func addRequestBody<TRequest> (_ body: TRequest?) where TRequest: Encodable {
         config.body = try? JSONEncoder().encode(body)
     }
     

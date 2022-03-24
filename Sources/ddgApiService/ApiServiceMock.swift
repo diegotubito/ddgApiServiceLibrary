@@ -7,7 +7,10 @@
 
 import Foundation
 
-class ApiCallMock {
+open class ApiCallMock {
+    public init() {
+        
+    }
     var error: APIError? = APIError.customError(message: "The password is invalid or the user does not have a password.", code: 503)
     
     public func api<T: Decodable>(completionBlock: @escaping (Result<T, APIError>) -> Void) {

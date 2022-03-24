@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum APIError: Equatable, Error, CustomStringConvertible {
+public enum APIError: Equatable, Error, CustomStringConvertible {
     case invalidToken
     case serverError
     case notFound
@@ -16,7 +16,7 @@ enum APIError: Equatable, Error, CustomStringConvertible {
     case request
     case customError(message: String, code: Int)
     
-    func message() -> String {
+    public func message() -> String {
         switch self {
         case .invalidToken:
             return "401_INVALID_TOKEN"
@@ -35,7 +35,7 @@ enum APIError: Equatable, Error, CustomStringConvertible {
         }
     }
     
-    func code() -> Int {
+    public func code() -> Int {
         switch self {
         case .invalidToken:
             return 401
@@ -54,7 +54,7 @@ enum APIError: Equatable, Error, CustomStringConvertible {
         }
     }
     
-    var description: String {
+    public var description: String {
         return "🧨⎽⎽⎽⎽⎽⎽⎽⎽⎽⎽⎽⎽⎽⎽⎽⎽⎽⎽\nmessage: \(message())\ncode: \(code())\n⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺⎺"
     }
 }
