@@ -13,11 +13,11 @@ open class ApiCallMock {
     }
     var error: APIError? = APIError.customError(message: "The password is invalid or the user does not have a password.", code: 503)
     
-    public func api<T: Decodable>(completionBlock: @escaping (Result<T, APIError>) -> Void) {
+    public func apiCallMocked<T: Decodable>(bundle: Bundle, completionBlock: @escaping (Result<T, APIError>) -> Void) {
         let file = ProcessInfo.processInfo.environment["FILENAME"] ?? ""
         let testFail = ProcessInfo.processInfo.arguments.contains("-testFail")
         
-        guard let data = readLocalFile(bundle: .main, forName: file) else {
+        guard let data = readLocalFile(bundle: bundle, forName: file) else {
             completionBlock(.failure(APIError.notFound))
             return
         }

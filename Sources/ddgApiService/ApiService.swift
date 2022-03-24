@@ -1,5 +1,5 @@
 
-import Foundation
+import UIKit
 
 public final class NetworkApiClientConfig: NSObject {
     public var body: Data?
