@@ -41,6 +41,25 @@ open class ApiCall {
         }
     }
     
+    // Data Wrapper
+    public func apiCallData(completion: @escaping (Result<Data, APIError>) -> Void) {
+        
+        fetch { result in
+            switch result {
+            case .failure(let error):
+                completion(.failure(error))
+                break
+            case .success(let data):
+                do {
+                    completion(.success(data))
+                } catch {
+                    completion(.failure(.serialize))
+                }
+                break
+            }
+        }
+    }
+    
     private func fetch(completion: @escaping (Result<Data, APIError>) -> Void) {
         guard let url = getUrl(withPath: config.path, query: config.query) else { fatalError("URL - incorrect format or missing string url") }
         guard let method = config.method else { fatalError("Method missing") }

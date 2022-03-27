@@ -40,6 +40,28 @@ open class ApiCallMock {
         completionBlock(.success(register))
     }
     
+    public func apiCallMockedData(bundle: Bundle, completionBlock: @escaping (Result<Data, APIError>) -> Void) {
+        let file = ProcessInfo.processInfo.environment["FILENAME"] ?? ""
+        let testFail = ProcessInfo.processInfo.arguments.contains("-testFail")
+        
+        guard let data = readLocalFile(bundle: bundle, forName: file) else {
+            completionBlock(.failure(APIError.notFound))
+            return
+        }
+        
+        if testFail {
+            let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
+            let message : String = (json?["message"] as? String) ?? "no message"
+            let code : String = (json?["code"] as? String) ?? "no code"
+            
+            let error = APIError.customError(message: message, code: Int(code) ?? 0)
+            completionBlock(.failure(error))
+            return
+        }
+        
+        completionBlock(.success(data))
+    }
+    
     private func readLocalFile(bundle: Bundle, forName name: String) -> Data? {
         guard let bundlePath = bundle.path(forResource: name, ofType: "json") else {
             fatalError("file \(name).json doesn't exist")
