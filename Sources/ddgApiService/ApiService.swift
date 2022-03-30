@@ -7,6 +7,25 @@ public final class NetworkApiClientConfig: NSObject {
     public var path: String = ""
     public var query: String?
     public var method: String?
+    public var headers: [String:String] = [:]
+    public var queryItems: [String: Any]?
+    let accessTokenKey = "access_token"
+    
+    public func addAccessTokenHeader(accessToken: String) {
+        headers[accessTokenKey] = accessToken
+    }
+    
+    public func addCustomHeader(key: String, value: String) {
+        headers[key] = value
+    }
+    
+    public func addQueryItem(key: String, value: String) {
+        if queryItems == nil {
+            queryItems = [:]
+        }
+        
+        queryItems?[key] = value
+    }
 }
 
 open class NetworkApiClient {
@@ -54,7 +73,11 @@ open class NetworkApiClient {
         request.httpMethod = method
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
         request.addValue("application/json", forHTTPHeaderField: "Accept")
-        request.addValue("", forHTTPHeaderField: "x-access-token")
+        
+        
+        for header in config.headers {
+            request.addValue(header.value, forHTTPHeaderField: header.key)
+        }
         
         if let body = config.body {
             request.httpBody = body
@@ -93,20 +116,25 @@ open class NetworkApiClient {
         dataTask?.resume()
     }
     
-    public func addRequestBody<TRequest> (_ body: TRequest?) where TRequest: Encodable {
-        config.body = try? JSONEncoder().encode(body)
-    }
-    
     private func getUrl(withPath path: String, query: String?) -> URL? {
         guard let host = config.host else {
             fatalError("need to specify host name like http://127.0.0.1:2999")
         }
         let path = path
-        var stringUrl = "\(host)/\(path)"
-        if let query = query {
-            stringUrl.append(query)
+        let stringUrl = "\(host)/\(path)"
+      
+        
+        var urlComponents = URLComponents(string: stringUrl)
+        
+        if let queryItems = config.queryItems {
+            urlComponents?.queryItems = queryItems.map { URLQueryItem(name: $0.key, value: $0.value as? String) }
         }
         
-        return URL(string: stringUrl)
+        return urlComponents?.url
     }
+    
+    public func addRequestBody<TRequest> (_ body: TRequest?) where TRequest: Encodable {
+        config.body = try? JSONEncoder().encode(body)
+    }
+    
 }
