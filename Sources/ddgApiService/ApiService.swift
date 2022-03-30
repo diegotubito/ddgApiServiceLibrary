@@ -5,15 +5,9 @@ public final class NetworkApiClientConfig: NSObject {
     public var host: String?
     public var body: Data?
     public var path: String = ""
-    public var query: String?
     public var method: String?
     public var headers: [String:String] = [:]
     public var queryItems: [String: Any]?
-    let accessTokenKey = "access_token"
-    
-    public func addAccessTokenHeader(accessToken: String) {
-        headers[accessTokenKey] = accessToken
-    }
     
     public func addCustomHeader(key: String, value: String) {
         headers[key] = value
@@ -67,7 +61,7 @@ open class NetworkApiClient {
     }
     
     private func fetch(completion: @escaping (Result<Data, APIError>) -> Void) {
-        guard let url = getUrl(withPath: config.path, query: config.query) else { fatalError("URL - incorrect format or missing string url") }
+        guard let url = getUrl(withPath: config.path) else { fatalError("URL - incorrect format or missing string url") }
         guard let method = config.method else { fatalError("Method missing") }
         var request = URLRequest(url: url)
         request.httpMethod = method
@@ -116,7 +110,7 @@ open class NetworkApiClient {
         dataTask?.resume()
     }
     
-    private func getUrl(withPath path: String, query: String?) -> URL? {
+    private func getUrl(withPath path: String) -> URL? {
         guard let host = config.host else {
             fatalError("need to specify host name like http://127.0.0.1:2999")
         }
