@@ -2,13 +2,14 @@
 import UIKit
 
 public final class NetworkApiClientConfig: NSObject {
+    public var host: String?
     public var body: Data?
     public var path: String = ""
     public var query: String?
     public var method: String?
 }
 
-open class ApiCall {
+open class NetworkApiClient {
     var session: URLSession
     var dataTask: URLSessionDataTask?
     var downloadTask: URLSessionDownloadTask?
@@ -43,21 +44,7 @@ open class ApiCall {
     
     // Data Wrapper
     public func apiCallData(completion: @escaping (Result<Data, APIError>) -> Void) {
-        
-        fetch { result in
-            switch result {
-            case .failure(let error):
-                completion(.failure(error))
-                break
-            case .success(let data):
-                do {
-                    completion(.success(data))
-                } catch {
-                    completion(.failure(.serialize))
-                }
-                break
-            }
-        }
+        fetch { result in completion(result) }
     }
     
     private func fetch(completion: @escaping (Result<Data, APIError>) -> Void) {
@@ -110,12 +97,10 @@ open class ApiCall {
         config.body = try? JSONEncoder().encode(body)
     }
     
-    private func getHost() -> String {
-        return "http://127.0.0.1:2999"
-    }
-    
     private func getUrl(withPath path: String, query: String?) -> URL? {
-        let host = getHost()
+        guard let host = config.host else {
+            fatalError("need to specify host name like http://127.0.0.1:2999")
+        }
         let path = path
         var stringUrl = "\(host)/\(path)"
         if let query = query {
