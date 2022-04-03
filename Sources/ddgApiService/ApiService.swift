@@ -90,21 +90,15 @@ open class NetworkApiClient {
                 return
             }
             
-            do {
-                let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
-                let status = response.statusCode
-                guard (200...299).contains(status) else {
-                    let message : String = (json?["message"] as? String) ?? "error code \(status)"
-                    completion(.failure(.customError(message: message, code: status)))
-                    
-                    return
-                }
-                completion(.success(data))
-            } catch {
-                completion(.failure(APIError.request))
+            let json = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
+            let status = response.statusCode
+            guard (200...299).contains(status) else {
+                let message : String = (json?["message"] as? String) ?? "error code \(status)"
+                completion(.failure(.customError(message: message, code: status)))
                 
                 return
             }
+            completion(.success(data))
         })
         
         dataTask?.resume()
